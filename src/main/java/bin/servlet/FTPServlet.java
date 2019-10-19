@@ -5,18 +5,15 @@ import bin.pojo.PageBean;
 import bin.utils.FTPUtil;
 import bin.utils.JsonUtils;
 import bin.utils.ObjectUtil;
-import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 
-import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -31,7 +28,7 @@ import java.util.Arrays;
 public class FTPServlet extends HttpServlet {
 
   @Override protected void service(HttpServletRequest req, HttpServletResponse resp)
-     throws ServletException, IOException {
+     throws IOException {
     req.setCharacterEncoding("utf-8");
     resp.setContentType("text/html;charset=utf-8");
     String url = req.getRequestURI().substring(4);
@@ -58,9 +55,9 @@ public class FTPServlet extends HttpServlet {
       System.out.println(FTPUtil.changeWorkingDirectory(ftp, url));
       FTPFile[] ftpFiles = ftp.listFiles();
       ArrayList<FileInfo> list = new ArrayList<>();
-      Arrays.stream(ftpFiles).skip((page.getCurrentPage() - 1) * page.getRows()).limit(10).forEach(file -> {
-        list.add(new FileInfo(file.getName(), file.getTimestamp().getTime(), file.isFile(), file.getSize()));
-      });
+      Arrays.stream(ftpFiles).skip((page.getCurrentPage() - 1) * page.getRows()).limit(10).forEach(file ->
+         list.add(new FileInfo(file.getName(), file.getTimestamp().getTime(), file.isFile(), file.getSize()))
+      );
       int count = (int)Math.ceil(ftpFiles.length * 1.0 / page.getRows());
       page.setTotalPage(count);
       page.setList(list);

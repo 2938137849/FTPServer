@@ -3,7 +3,6 @@ package bin.pojo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.Range;
 
 import java.util.List;
 
