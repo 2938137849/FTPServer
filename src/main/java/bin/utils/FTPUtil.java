@@ -4,12 +4,9 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
-import org.jetbrains.annotations.Contract;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -18,21 +15,13 @@ import java.util.Properties;
  * @version 1.0.0
  */
 public class FTPUtil {
-  /**
-   * 账号
-   */
+  /** 账号 */
   private static String username;
-  /**
-   * 密码
-   */
+  /** 密码 */
   private static String password;
-  /**
-   * FTP服务器地址
-   */
+  /** FTP服务器地址 */
   private static String ip;
-  /**
-   * 服务器端口号
-   */
+  /** 服务器端口号 */
   private static String port;
 
   static {
