@@ -7,6 +7,7 @@ import bin.utils.JsonUtils;
 import bin.utils.ObjectUtil;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.io.CopyStreamException;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
@@ -46,19 +47,30 @@ public class FTPServlet extends HttpServlet {
     String json = ObjectUtil.getBodyInResqust(req);
     PageBean page = JsonUtils.jsonToPojo(json, PageBean.class);
     if (page == null) {
-      page = new PageBean(1, 10, 0, null);
+      page = new PageBean(1, 10, 1, null);
     }
-
     FTPClient ftp = FTPUtil.connect();
 
+getFile:
     if (FTPUtil.isOpen(ftp)) {
-      System.out.println(FTPUtil.changeWorkingDirectory(ftp, url));
+      boolean isExist = FTPUtil.changeWorkingDirectory(ftp, url);
+      if (!isExist) {
+        break getFile;
+      }
       FTPFile[] ftpFiles = ftp.listFiles();
       ArrayList<FileInfo> list = new ArrayList<>();
-      Arrays.stream(ftpFiles).skip((page.getCurrentPage() - 1) * page.getRows()).limit(10).forEach(file ->
-         list.add(new FileInfo(file.getName(), file.getTimestamp().getTime(), file.isFile(), file.getSize()))
-      );
-      int count = (int)Math.ceil(ftpFiles.length * 1.0 / page.getRows());
+      int rows = page.getRows();
+      int currentPage = (page.getCurrentPage() - 1) * rows;
+      int count = (int)Math.ceil(ftpFiles.length * 1.0 / rows);
+      if (currentPage >= count) {
+        currentPage = count - 1;
+      } else if (currentPage < 0) {
+        currentPage = 0;
+      }
+      Arrays.stream(ftpFiles).skip(currentPage).limit(rows).forEach(file -> {
+        list.add(new FileInfo(file.getName(), file.getTimestamp().getTime(), file.isFile(), file.getSize()));
+      });
+      page.setCurrentPage(1);
       page.setTotalPage(count);
       page.setList(list);
     }
@@ -74,8 +86,13 @@ public class FTPServlet extends HttpServlet {
       FTPFile[] ftpFiles = ftp.listFiles();
       for (FTPFile ftpFile : ftpFiles) {
         if (ftpFile.getName().equals(fileName)) {
-          FTPUtil.retrieveFile(ftp, ftpFile, os);
+          try {
+            FTPUtil.retrieveFile(ftp, ftpFile, os);
+          } catch (CopyStreamException e) {
+            System.err.println("============ Force disconnect ============");
+          }
           os.flush();
+          return;
         }
       }
     }
