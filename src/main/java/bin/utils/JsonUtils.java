@@ -3,7 +3,6 @@ package bin.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -36,7 +35,6 @@ public class JsonUtils {
    * @param beanType 对象中的object类型
    * @return json
    */
-  @Nullable
   public static <T> T jsonToPojo(String jsonData, Class<T> beanType) {
     try {
       return MAPPER.readValue(jsonData, beanType);
@@ -55,7 +53,6 @@ public class JsonUtils {
    * @param beanType 对象类型
    * @return 对象列表
    */
-  @Nullable
   public static <T> List<T> jsonToList(String jsonData, Class<T> beanType) {
     JavaType javaType = MAPPER.getTypeFactory().constructParametricType(List.class, beanType);
     try {

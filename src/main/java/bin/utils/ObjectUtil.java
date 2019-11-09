@@ -1,12 +1,6 @@
 package bin.utils;
 
-//import org.apache.commons.beanutils.BeanUtils;
-
-import com.fasterxml.jackson.annotation.JacksonAnnotation;
-import com.fasterxml.jackson.databind.annotation.JacksonStdImpl;
-import com.fasterxml.jackson.databind.util.BeanUtil;
 import org.apache.commons.beanutils.BeanUtils;
-import org.jetbrains.annotations.Contract;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
@@ -25,7 +19,7 @@ public class ObjectUtil {
    * @param string 要判断的字符串
    * @return 当且仅当字符串为 {@code null} 或长度为0时返回 {@code true}
    */
-  @Contract(value = "null -> true", pure = true) public static boolean isEmpty(String string) {
+  public static boolean isEmpty(String string) {
     return string == null || "".equals(string);
   }
 
@@ -35,7 +29,7 @@ public class ObjectUtil {
    * @param string 要判断的字符串
    * @return 当且仅当字符串长度大于0时返回 {@code true}
    */
-  @Contract(value = "null -> false", pure = true) public static boolean notEmpty(String string) {
+  public static boolean notEmpty(String string) {
     return string != null && string.length() > 0;
   }
 
