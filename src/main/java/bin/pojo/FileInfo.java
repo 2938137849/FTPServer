@@ -1,7 +1,9 @@
 package bin.pojo;
 
+import bin.interfaces.CastToJSON;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -11,9 +13,19 @@ import java.util.Date;
  */
 @Data
 @AllArgsConstructor
-public class FileInfo {
+@NoArgsConstructor
+public class FileInfo implements  CastToJSON {
   private String name;
   private Date editDate;
   private boolean fileType;
   private long size;
+
+  public String toJSON() {
+    return "{" +
+           "\"name\":\"" + name +
+           "\",\"editDate\":" + editDate.getTime() +
+           ",\"fileType\":" + fileType +
+           ",\"size\":" + size +
+           "}";
+  }
 }

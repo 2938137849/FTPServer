@@ -17,7 +17,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -33,12 +32,12 @@ public class FTPServlet extends HttpServlet {
     req.setCharacterEncoding("utf-8");
     resp.setContentType("text/html;charset=utf-8");
     String url = req.getRequestURI().substring(4);
-    url = URLDecoder.decode(url, StandardCharsets.UTF_8);
+    url = URLDecoder.decode(url, "UTF-8");
 
     String fileName = req.getParameter("file");
     if (ObjectUtil.notEmpty(fileName)) {
       resp.setHeader(
-         "Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, StandardCharsets.UTF_8));
+         "Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
       resp.setContentType("application/octet-stream");
       sendFile(resp.getOutputStream(), url, fileName);
       return;
@@ -49,6 +48,7 @@ public class FTPServlet extends HttpServlet {
     if (page == null) {
       page = new PageBean(1, 10, 1, null);
     }
+
     FTPClient ftp = FTPUtil.connect();
 
 getFile:
@@ -60,23 +60,25 @@ getFile:
       FTPFile[] ftpFiles = ftp.listFiles();
       ArrayList<FileInfo> list = new ArrayList<>();
       int rows = page.getRows();
-      int currentPage = (page.getCurrentPage() - 1) * rows;
+      int currentPage = page.getCurrentPage();
       int count = (int)Math.ceil(ftpFiles.length * 1.0 / rows);
-      if (currentPage >= count) {
-        currentPage = count - 1;
-      } else if (currentPage < 0) {
-        currentPage = 0;
+      if (currentPage > count) {
+        currentPage = count;
+        page.setCurrentPage(count);
+      } else if (currentPage < 1) {
+        currentPage = 1;
+        page.setCurrentPage(1);
       }
+      currentPage = (currentPage - 1) * rows;
       Arrays.stream(ftpFiles).skip(currentPage).limit(rows).forEach(file -> {
         list.add(new FileInfo(file.getName(), file.getTimestamp().getTime(), file.isFile(), file.getSize()));
       });
-      page.setCurrentPage(1);
       page.setTotalPage(count);
       page.setList(list);
     }
 
     FTPUtil.close(ftp);
-    resp.getWriter().write(JsonUtils.objectToJson(page));
+    resp.getWriter().write(page.toJSON());
   }
 
   private void sendFile(ServletOutputStream os, String url, String fileName) throws IOException {
@@ -91,6 +93,7 @@ getFile:
           } catch (CopyStreamException e) {
             System.err.println("============ Force disconnect ============");
           }
+          System.out.println("a");
           os.flush();
           return;
         }
