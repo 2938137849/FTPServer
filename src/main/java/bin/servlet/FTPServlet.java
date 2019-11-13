@@ -84,19 +84,18 @@ getFile:
   private void sendFile(ServletOutputStream os, String url, String fileName) throws IOException {
     FTPClient ftp = FTPUtil.connect();
     if (FTPUtil.isOpen(ftp)) {
-      FTPUtil.changeWorkingDirectory(ftp, url);
+      if (!FTPUtil.changeWorkingDirectory(ftp, url)) return;
       FTPFile[] ftpFiles = ftp.listFiles();
-      for (FTPFile ftpFile : ftpFiles) {
-        if (ftpFile.getName().equals(fileName)) {
-          try {
+      try {
+        for (FTPFile ftpFile : ftpFiles) {
+          if (ftpFile.getName().equals(fileName)) {
             FTPUtil.retrieveFile(ftp, ftpFile, os);
-          } catch (CopyStreamException e) {
-            System.err.println("============ Force disconnect ============");
+            os.flush();
+            return;
           }
-          System.out.println("a");
-          os.flush();
-          return;
         }
+      } catch (CopyStreamException e) {
+        System.err.println("============ Force disconnect ============");
       }
     }
   }
