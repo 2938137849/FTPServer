@@ -7,7 +7,6 @@ import org.apache.commons.net.ftp.FTPReply;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Objects;
 import java.util.Properties;
 
 /**
@@ -16,25 +15,25 @@ import java.util.Properties;
  */
 public class FTPUtil {
   /** 账号 */
-  private static String username;
+  private final static String username;
   /** 密码 */
-  private static String password;
+  private final static String password;
   /** FTP服务器地址 */
-  private static String ip;
+  private final static String ip;
   /** 服务器端口号 */
-  private static String port;
+  private final static String port;
 
   static {
     Properties pp = new Properties();
     try {
-      pp.load(Objects.requireNonNull(FTPUtil.class.getClassLoader().getResourceAsStream("config.properties")));
-      FTPUtil.ip = pp.getProperty("FTP.ip");
-      FTPUtil.port = pp.getProperty("FTP.port");
-      FTPUtil.username = pp.getProperty("FTP.username");
-      FTPUtil.password = pp.getProperty("FTP.password");
+      pp.load(FTPUtil.class.getClassLoader().getResourceAsStream("config.properties"));
     } catch (IOException e) {
       e.printStackTrace();
     }
+    ip = pp.getProperty("FTP.ip");
+    port = pp.getProperty("FTP.port");
+    username = pp.getProperty("FTP.username");
+    password = pp.getProperty("FTP.password");
   }
 
   public static FTPClient connect() {

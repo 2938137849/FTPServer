@@ -7,16 +7,13 @@ import bin.utils.JsonUtils;
 import bin.utils.ObjectUtil;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.io.CopyStreamException;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -26,22 +23,12 @@ import java.util.Arrays;
  */
 @WebServlet("/FTP/*")
 public class FTPServlet extends HttpServlet {
-
   @Override protected void service(HttpServletRequest req, HttpServletResponse resp)
      throws IOException {
     req.setCharacterEncoding("utf-8");
     resp.setContentType("text/html;charset=utf-8");
     String url = req.getRequestURI().substring(4);
     url = URLDecoder.decode(url, "UTF-8");
-
-    String fileName = req.getParameter("file");
-    if (ObjectUtil.notEmpty(fileName)) {
-      resp.setHeader(
-         "Content-Disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
-      resp.setContentType("application/octet-stream");
-      sendFile(resp.getOutputStream(), url, fileName);
-      return;
-    }
 
     String json = ObjectUtil.getBodyInResqust(req);
     PageBean page = JsonUtils.jsonToPojo(json, PageBean.class);
@@ -70,34 +57,15 @@ getFile:
         page.setCurrentPage(1);
       }
       currentPage = (currentPage - 1) * rows;
-      Arrays.stream(ftpFiles).skip(currentPage).limit(rows).forEach(file -> {
-        list.add(new FileInfo(file.getName(), file.getTimestamp().getTime(), file.isFile(), file.getSize()));
-      });
+      Arrays.stream(ftpFiles).skip(currentPage).limit(rows).forEach(
+         file -> list.add(new FileInfo(file.getName(), file.getTimestamp().getTime(), file.isFile(), file.getSize())));
       page.setTotalPage(count);
       page.setList(list);
     }
 
     FTPUtil.close(ftp);
-    resp.getWriter().write(page.toJSON());
-  }
 
-  private void sendFile(ServletOutputStream os, String url, String fileName) throws IOException {
-    FTPClient ftp = FTPUtil.connect();
-    if (FTPUtil.isOpen(ftp)) {
-      if (!FTPUtil.changeWorkingDirectory(ftp, url)) return;
-      FTPFile[] ftpFiles = ftp.listFiles();
-      try {
-        for (FTPFile ftpFile : ftpFiles) {
-          if (ftpFile.getName().equals(fileName)) {
-            FTPUtil.retrieveFile(ftp, ftpFile, os);
-            os.flush();
-            return;
-          }
-        }
-      } catch (CopyStreamException e) {
-        System.err.println("============ Force disconnect ============");
-      }
-    }
+    resp.getWriter().write(page.toJSON());
   }
 
   @Override public void destroy() {

@@ -14,11 +14,12 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FileInfo implements  CastToJSON {
+public class FileInfo implements CastToJSON {
   private String name;
   private Date editDate;
   private boolean fileType;
   private long size;
+
 
   public String toJSON() {
     return "{" +

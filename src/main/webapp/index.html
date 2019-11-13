@@ -15,7 +15,9 @@
   <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
-
+  <script src="plugins/AdminLTE/bower_components/jquery/dist/jquery.min.js"></script>
+  <script src="plugins/AdminLTE/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="plugins/AdminLTE/dist/js/adminlte.min.js"></script>
   <!-- Google Font -->
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
@@ -32,7 +34,7 @@
       <!-- mini logo for sidebar mini 50x50 pixels -->
       <span class="logo-mini"><b>A</b>LT</span>
       <!-- logo for regular state and mobile devices -->
-      <span class="logo-lg"><b>bin</b>的<b>网盘</b></span>
+      <span class="logo-lg"><b>bin</b>的<b>小屋</b></span>
     </a>
 
     <!-- Header Navbar -->
@@ -62,16 +64,17 @@
       <ul id="sidebar" class="sidebar-menu" data-widget="tree">
         <li class="header">HEADER</li>
         <!-- Optionally, you can add icons to the links -->
+        <li class="active"><a class="treeview-menu" href="Default.html" target="iframe">回到主页</a></li>
         <li class="treeview">
           <a href="#">
             <i class="fa fa-link"></i>
-            <span>FTP硬盘</span>
+            <span>仓库</span>
             <span class="pull-right-container">
-                          <i class="fa fa-angle-left pull-right"></i>
-                      </span>
+              <i class="fa fa-angle-left pull-right"></i>
+            </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="FTP.html" target="iframe">src-bin</a></li>
+            <li><a href="FTP.html" target="iframe">FTP硬盘:src-bin</a></li>
           </ul>
         </li>
       </ul>
@@ -81,7 +84,8 @@
   </aside>
   <!-- 内容区域 -->
   <div id="content" class="content-wrapper">
-    <iframe width="100%" id="iframe" name="iframe" onload="SetIFrameHeight()" frameborder="0" src="FTP.html"></iframe>
+    <iframe width="100%" id="iframe" name="iframe" onload="SetIFrameHeight()" frameborder="0"
+            src="Default.html"></iframe>
   </div>
 
   <!-- 底部导航 -->
@@ -180,10 +184,6 @@
   immediately after the control sidebar -->
   <div class="control-sidebar-bg"></div>
 </div>
-<!-- ./wrapper -->
-<script src="plugins/AdminLTE/bower_components/jquery/dist/jquery.min.js"></script>
-<script src="plugins/AdminLTE/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="plugins/AdminLTE/dist/js/adminlte.min.js"></script>
 <!-- REQUIRED JS SCRIPTS -->
 <script type="text/javascript">
   function SetIFrameHeight() {
