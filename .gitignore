@@ -2,3 +2,4 @@
 config.properties
 target/*
 *.iml
+*.class

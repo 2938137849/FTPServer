@@ -34,8 +34,8 @@ public class FTPServlet extends HttpServlet {
     resp.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
     /* 设置允许跨域的请求头 (Access-Control-Request-Headers)*/
     resp.setHeader("Access-Control-Allow-Headers", "*");
-    /* 设置允许跨域时间 */
-//    resp.setHeader("Access-Control-Max-Age", "3600");
+    /* 设置允许跨域时间 (1天)*/
+    resp.setHeader("Access-Control-Max-Age", "86400");
     /* 设置cookie 是否允许跨域 */
 //    resp.setHeader("Access-Control-Allow-Credentials", "true");
 
