@@ -25,8 +25,14 @@ import java.util.Arrays;
 public class FTPServlet extends HttpServlet {
   @Override protected void service(HttpServletRequest req, HttpServletResponse resp)
      throws IOException {
+
+    /* 允许跨域的主机地址 */
+    resp.setHeader("Access-Control-Allow-Origin", "*");
+    /* 允许跨域的请求方法GET, POST, HEAD 等 */
+    resp.setHeader("Access-Control-Allow-Methods", "POST");
+
     req.setCharacterEncoding("utf-8");
-    resp.setContentType("text/html;charset=utf-8");
+    resp.setContentType("application/json;charset=utf-8");
     String url = req.getRequestURI().substring(4);
     url = URLDecoder.decode(url, "UTF-8");
 
