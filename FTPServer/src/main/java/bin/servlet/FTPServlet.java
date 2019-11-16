@@ -23,16 +23,24 @@ import java.util.Arrays;
  */
 @WebServlet("/FTP/*")
 public class FTPServlet extends HttpServlet {
-  @Override protected void service(HttpServletRequest req, HttpServletResponse resp)
+  @Override
+  protected void service(HttpServletRequest req, HttpServletResponse resp)
      throws IOException {
+    req.setCharacterEncoding("utf-8");
 
     /* 允许跨域的主机地址 */
     resp.setHeader("Access-Control-Allow-Origin", "*");
-    /* 允许跨域的请求方法GET, POST, HEAD 等 */
-    resp.setHeader("Access-Control-Allow-Methods", "POST");
+    /* 允许跨域的请求方法GET, POST, HEAD 等 (Access-Control-Request-Method)*/
+    resp.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
+    /* 设置允许跨域的请求头 (Access-Control-Request-Headers)*/
+    resp.setHeader("Access-Control-Allow-Headers", "*");
+    /* 设置允许跨域时间 */
+//    resp.setHeader("Access-Control-Max-Age", "3600");
+    /* 设置cookie 是否允许跨域 */
+//    resp.setHeader("Access-Control-Allow-Credentials", "true");
 
-    req.setCharacterEncoding("utf-8");
     resp.setContentType("application/json;charset=utf-8");
+
     String url = req.getRequestURI().substring(4);
     url = URLDecoder.decode(url, "UTF-8");
 
@@ -41,10 +49,8 @@ public class FTPServlet extends HttpServlet {
     if (page == null) {
       page = new PageBean(1, 10, 1, null);
     }
-
     FTPClient ftp = FTPUtil.connect();
-
-getFile:
+    getFile:
     if (FTPUtil.isOpen(ftp)) {
       boolean isExist = FTPUtil.changeWorkingDirectory(ftp, url);
       if (!isExist) {
@@ -54,7 +60,7 @@ getFile:
       ArrayList<FileInfo> list = new ArrayList<>();
       int rows = page.getRows();
       int currentPage = page.getCurrentPage();
-      int count = (int)Math.ceil(ftpFiles.length * 1.0 / rows);
+      int count = (int) Math.ceil(ftpFiles.length * 1.0 / rows);
       if (currentPage > count) {
         currentPage = count;
         page.setCurrentPage(count);
@@ -68,14 +74,8 @@ getFile:
       page.setTotalPage(count);
       page.setList(list);
     }
-
     FTPUtil.close(ftp);
-
     resp.getWriter().write(page.toJSON());
-  }
 
-  @Override public void destroy() {
-    super.destroy();
   }
-
 }
