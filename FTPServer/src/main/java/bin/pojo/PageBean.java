@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PageBean implements CastToJSON {
+public class PageBean implements CastToJSON, Serializable {
   private int currentPage;
   private int rows;
   private int totalPage;

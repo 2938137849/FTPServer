@@ -1,81 +1,42 @@
 package bin.servlet;
 
-import bin.pojo.FileInfo;
 import bin.pojo.PageBean;
-import bin.utils.FTPUtil;
+import bin.service.FTPService;
 import bin.utils.JsonUtils;
-import bin.utils.ObjectUtil;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
-
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Arrays;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author bin
  * @version 1.0.0
  */
-@WebServlet("/FTP/*")
-public class FTPServlet extends HttpServlet {
-  @Override
-  protected void service(HttpServletRequest req, HttpServletResponse resp)
-     throws IOException {
-    req.setCharacterEncoding("utf-8");
+@RestController
+@RequestMapping
+@CrossOrigin(origins = "*", maxAge = 86400, methods = RequestMethod.POST, allowedHeaders = "*")
+public class FTPServlet {
+  @Autowired
+  private FTPService service;
 
-    /* 允许跨域的主机地址 */
-    resp.setHeader("Access-Control-Allow-Origin", "*");
-    /* 允许跨域的请求方法GET, POST, HEAD 等 (Access-Control-Request-Method)*/
-    resp.setHeader("Access-Control-Allow-Methods", "POST,OPTIONS");
-    /* 设置允许跨域的请求头 (Access-Control-Request-Headers)*/
-    resp.setHeader("Access-Control-Allow-Headers", "*");
-    /* 设置允许跨域时间 (1天)*/
-    resp.setHeader("Access-Control-Max-Age", "86400");
-    /* 设置cookie 是否允许跨域 */
-//    resp.setHeader("Access-Control-Allow-Credentials", "true");
 
-    resp.setContentType("application/json;charset=utf-8");
-
-    String url = req.getRequestURI().substring(4);
-    url = URLDecoder.decode(url, "UTF-8");
-
-    String json = ObjectUtil.getBodyInResqust(req);
+  @RequestMapping(value = "/FTP/{url}")
+  @ResponseBody
+  public PageBean findByName(@PathVariable String url, @RequestBody String json, @RequestParam("regex") String regex) {
     PageBean page = JsonUtils.jsonToPojo(json, PageBean.class);
     if (page == null) {
       page = new PageBean(1, 10, 1, null);
     }
-    FTPClient ftp = FTPUtil.connect();
-    getFile:
-    if (FTPUtil.isOpen(ftp)) {
-      boolean isExist = FTPUtil.changeWorkingDirectory(ftp, url);
-      if (!isExist) {
-        break getFile;
-      }
-      FTPFile[] ftpFiles = ftp.listFiles();
-      ArrayList<FileInfo> list = new ArrayList<>();
-      int rows = page.getRows();
-      int currentPage = page.getCurrentPage();
-      int count = (int) Math.ceil(ftpFiles.length * 1.0 / rows);
-      if (currentPage > count) {
-        currentPage = count;
-        page.setCurrentPage(count);
-      } else if (currentPage < 1) {
-        currentPage = 1;
-        page.setCurrentPage(1);
-      }
-      currentPage = (currentPage - 1) * rows;
-      Arrays.stream(ftpFiles).skip(currentPage).limit(rows).forEach(
-         file -> list.add(new FileInfo(file.getName(), file.getTimestamp().getTime(), file.isFile(), file.getSize())));
-      page.setTotalPage(count);
-      page.setList(list);
-    }
-    FTPUtil.close(ftp);
-    resp.getWriter().write(page.toJSON());
-
+    if (regex.trim().equals(""))
+      service.findAll(url, page);
+    else
+      service.findByName(url, page, regex);
+    return page;
   }
+
 }

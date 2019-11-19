@@ -4,6 +4,7 @@ import bin.interfaces.CastToJSON;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.net.ftp.FTPFile;
 
 import java.util.Date;
 
@@ -20,6 +21,9 @@ public class FileInfo implements CastToJSON {
   private boolean fileType;
   private long size;
 
+  public FileInfo(FTPFile file) {
+    this(file.getName(), file.getTimestamp().getTime(), file.isFile(), file.getSize());
+  }
 
   public String toJSON() {
     return "{" +

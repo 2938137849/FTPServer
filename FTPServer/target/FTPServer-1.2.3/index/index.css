@@ -1,0 +1,25 @@
+nav > ul:empty::after {
+    content: '建设中';
+    display: block;
+    text-align: left;
+    font-size: 20px;
+    width: 50px;
+}
+
+p {
+    margin-bottom: 10px;
+}
+
+nav > ul > li:hover::after {
+    content: '<';
+    position: fixed;
+    margin-left: 10px;
+    text-align: right;
+    font-family: Consolas, serif;
+    font-size: 20px;
+    color: rgba(0, 0, 0, 0.7);
+}
+
+/*.wrapper:nth-of-type(2) > * > *:hover {*/
+/*    margin-left: 10px;*/
+/*}*/
